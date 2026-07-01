@@ -39,12 +39,18 @@ java {
 
 jar {
     from("LICENSE") {
-        rename it, "LICENSE_${archives_base_name}"
+        rename { "LICENSE_${archives_base_name}" }
     }
 }
 
-publishingConvention {
-    registerPublication {
-        it.artifactId = archives_base_name
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = archives_base_name
+            from components.java
+        }
+    }
+    repositories {
+        // Add repositories to publish to here.
     }
 }
