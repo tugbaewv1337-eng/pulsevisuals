@@ -37,6 +37,14 @@ java {
     withSourcesJar()
 }
 
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
 jar {
     from("LICENSE") {
         rename { "LICENSE_${archives_base_name}" }
