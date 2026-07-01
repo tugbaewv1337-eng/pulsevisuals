@@ -23,11 +23,9 @@ public class RenderUtils {
         Vector3f endVec = new Vector3f((float) end.x, (float) end.y, (float) end.z);
 
         vertexConsumer.vertex(matrix, startVec.x, startVec.y, startVec.z)
-            .color(r, g, b, a)
-            .next();
+            .color(r, g, b, a);
         vertexConsumer.vertex(matrix, endVec.x, endVec.y, endVec.z)
-            .color(r, g, b, a)
-            .next();
+            .color(r, g, b, a);
     }
 
     /**
