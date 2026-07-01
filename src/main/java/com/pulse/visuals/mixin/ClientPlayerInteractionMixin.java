@@ -4,18 +4,20 @@ import com.pulse.visuals.PulseVisualsClient;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerInteractionManager.class)
 public class ClientPlayerInteractionMixin {
 
     @Inject(method = "attackEntity", at = @At("HEAD"))
-    private void onAttackEntity(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+    private void onAttackEntity(PlayerEntity player, Entity entity, CallbackInfo ci) {
         if (entity instanceof LivingEntity livingEntity) {
             // Determine if this is a critical hit
             // In Minecraft, critical hits happen when falling
