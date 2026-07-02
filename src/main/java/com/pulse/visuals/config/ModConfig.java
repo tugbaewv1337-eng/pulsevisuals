@@ -15,6 +15,13 @@ public class ModConfig {
     public static int TARGET_HUD_X = 10;
     public static int TARGET_HUD_Y = 10;
 
+    // Self HUD widgets
+    public static boolean ENABLE_WATERMARK = false;
+    public static boolean ENABLE_ARMOR_HUD = false;
+    public static boolean ENABLE_SATURATION_HUD = false;
+    public static boolean ENABLE_POTIONS_HUD = false;
+    public static boolean ENABLE_COOLDOWNS_HUD = false;
+
     // Damage Numbers settings
     public static boolean ENABLE_DAMAGE_NUMBERS = true;
     public static float DAMAGE_NUMBER_SCALE = 1.0f;

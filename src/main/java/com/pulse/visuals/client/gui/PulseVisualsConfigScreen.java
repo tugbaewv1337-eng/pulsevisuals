@@ -78,9 +78,18 @@ public class PulseVisualsConfigScreen extends Screen {
             () -> ModConfig.ENABLE_TARGET_HUD, v -> ModConfig.ENABLE_TARGET_HUD = v));
         hudFeatures.add(new FeatureDef("Damage Numbers", true,
             () -> ModConfig.ENABLE_DAMAGE_NUMBERS, v -> ModConfig.ENABLE_DAMAGE_NUMBERS = v));
+        hudFeatures.add(new FeatureDef("Armor HUD", true,
+            () -> ModConfig.ENABLE_ARMOR_HUD, v -> ModConfig.ENABLE_ARMOR_HUD = v));
+        hudFeatures.add(new FeatureDef("Saturation HUD", true,
+            () -> ModConfig.ENABLE_SATURATION_HUD, v -> ModConfig.ENABLE_SATURATION_HUD = v));
+        hudFeatures.add(new FeatureDef("Potions", true,
+            () -> ModConfig.ENABLE_POTIONS_HUD, v -> ModConfig.ENABLE_POTIONS_HUD = v));
+        hudFeatures.add(new FeatureDef("Cooldowns HUD", true,
+            () -> ModConfig.ENABLE_COOLDOWNS_HUD, v -> ModConfig.ENABLE_COOLDOWNS_HUD = v));
+        hudFeatures.add(new FeatureDef("Watermark", true,
+            () -> ModConfig.ENABLE_WATERMARK, v -> ModConfig.ENABLE_WATERMARK = v));
         String[] hudStubs = {
-            "Armor HUD", "Cooldowns HUD", "Effect Notify", "Hotkeys",
-            "Inventory HUD", "Potions", "Saturation HUD", "Watermark"
+            "Effect Notify", "Hotkeys", "Inventory HUD"
         };
         for (String name : hudStubs) {
             hudFeatures.add(new FeatureDef(name, false, stubGetter(name), stubSetter(name)));
