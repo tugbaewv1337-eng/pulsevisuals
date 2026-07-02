@@ -7,7 +7,12 @@ import com.pulse.visuals.client.visual.DamageNumberRenderer;
 import com.pulse.visuals.client.visual.TrajectoryRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +26,8 @@ public class PulseVisualsClient implements ClientModInitializer {
     private static TrajectoryRenderer trajectoryRenderer;
     private static ClientEventHandler eventHandler;
 
+    public static KeyBinding openPanelKey;
+
     @Override
     public void onInitializeClient() {
         LOGGER.info("Initializing PulseVisuals...");
@@ -32,9 +39,18 @@ public class PulseVisualsClient implements ClientModInitializer {
         trajectoryRenderer = new TrajectoryRenderer();
         eventHandler = new ClientEventHandler();
 
+        // Register the key used to open the settings panel (default: P)
+        openPanelKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.pulsevisuals.openpanel",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_P,
+            "category.pulsevisuals"
+        ));
+
         // Register event listeners
         ClientTickEvents.END_CLIENT_TICK.register(eventHandler::onClientTick);
         WorldRenderEvents.END.register(eventHandler::onWorldRenderEnd);
+        HudRenderCallback.EVENT.register(eventHandler::onHudRender);
 
         LOGGER.info("PulseVisuals initialized successfully!");
     }
