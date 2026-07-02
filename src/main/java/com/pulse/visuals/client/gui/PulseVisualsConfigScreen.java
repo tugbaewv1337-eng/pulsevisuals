@@ -160,7 +160,8 @@ public class PulseVisualsConfigScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context, mouseX, mouseY, delta);
+        // Darken the background without the vanilla blur shader
+        context.fill(0, 0, this.width, this.height, 0x99000000);
 
         // Main panel background
         context.fill(panelX, panelY, panelX + panelWidth, panelY + panelHeight, PANEL_BG);
