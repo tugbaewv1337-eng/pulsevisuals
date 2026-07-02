@@ -1,7 +1,13 @@
 package com.pulse.visuals.client.visual;
 
+import com.pulse.visuals.client.util.RenderUtils;
+import com.pulse.visuals.config.ModConfig;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.world.World;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,6 +25,10 @@ public class TrajectoryRenderer {
     public void update(World world, PlayerEntity player) {
         trajectoryPoints.clear();
         currentProjectile = null;
+
+        if (!ModConfig.ENABLE_TRAJECTORY_PREDICTION) {
+            return;
+        }
 
         // Find nearby projectiles (arrows, etc.)
         List<ProjectileEntity> projectiles = world.getEntitiesByClass(
@@ -59,12 +69,27 @@ public class TrajectoryRenderer {
     }
 
     public void render(WorldRenderContext context) {
-        if (trajectoryPoints.isEmpty()) {
+        if (!ModConfig.ENABLE_TRAJECTORY_PREDICTION || trajectoryPoints.size() < 2) {
             return;
         }
 
-        // Rendering would be done here with line rendering
-        // This is a placeholder for the trajectory visualization system
+        MinecraftClient client = MinecraftClient.getInstance();
+        Vec3d cameraPos = client.gameRenderer.getCamera().getPos();
+
+        MatrixStack matrices = context.matrixStack();
+        VertexConsumerProvider consumers = context.consumers();
+        if (matrices == null || consumers == null) {
+            return;
+        }
+
+        VertexConsumer lineBuffer = consumers.getBuffer(RenderLayer.getLines());
+        MatrixStack.Entry entry = matrices.peek();
+
+        for (int i = 0; i < trajectoryPoints.size() - 1; i++) {
+            Vec3d start = trajectoryPoints.get(i).subtract(cameraPos);
+            Vec3d end = trajectoryPoints.get(i + 1).subtract(cameraPos);
+            RenderUtils.drawLine(lineBuffer, entry, start, end, ModConfig.TRAJECTORY_COLOR);
+        }
     }
 
     public List<Vec3d> getTrajectoryPoints() {
