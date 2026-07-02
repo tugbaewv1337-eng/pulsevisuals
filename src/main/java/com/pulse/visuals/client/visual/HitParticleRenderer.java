@@ -1,74 +1,63 @@
 package com.pulse.visuals.client.visual;
 
+import com.pulse.visuals.config.ModConfig;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
+import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.joml.Vector3f;
 
 public class HitParticleRenderer {
-    private final List<HitParticle> particles = new ArrayList<>();
 
     public void addHitParticle(Vec3d position, boolean isCritical) {
-        // Create particle with random velocity
-        double vx = (Math.random() - 0.5) * 0.4;
-        double vy = Math.random() * 0.3 + 0.1;
-        double vz = (Math.random() - 0.5) * 0.4;
+        if (!ModConfig.ENABLE_HIT_PARTICLES) return;
 
-        Vec3d velocity = new Vec3d(vx, vy, vz);
-
-        // Different colors for critical and normal hits
-        int color = isCritical ? 0xFF6B3A : 0xFFD700; // Red for crit, Gold for normal
-        float scale = isCritical ? 1.5f : 1.0f;
-        int lifetime = isCritical ? 30 : 25;
-
-        particles.add(new HitParticle(position, velocity, lifetime, color, scale, isCritical));
-    }
-
-    public void render(WorldRenderContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null) return;
+        if (client.world == null) return;
 
-        // Update and filter dead particles
-        particles.removeIf(particle -> !particle.isAlive());
-        particles.forEach(HitParticle::update);
+        float r;
+        float g;
+        float b;
+        if (isCritical) {
+            // Red-orange for critical hits
+            r = 1.0f;
+            g = 0.42f;
+            b = 0.23f;
+        } else {
+            // Gold for normal hits
+            r = 1.0f;
+            g = 0.84f;
+            b = 0.0f;
+        }
 
-        // Render particles
-        VertexConsumerProvider vertexConsumers = context.consumers();
-        Matrix4f positionMatrix = context.matrixStack().peek().getPositionMatrix();
+        float scale = (isCritical ? 1.5f : 1.0f) * ModConfig.HIT_PARTICLE_SCALE;
+        int count = isCritical ? 8 : 4;
 
-        for (HitParticle particle : particles) {
-            renderParticle(particle, client, vertexConsumers, positionMatrix);
+        DustParticleEffect effect = new DustParticleEffect(new Vector3f(r, g, b), scale);
+
+        for (int i = 0; i < count; i++) {
+            double offsetX = (client.world.random.nextDouble() - 0.5) * 0.5;
+            double offsetY = client.world.random.nextDouble() * 0.5;
+            double offsetZ = (client.world.random.nextDouble() - 0.5) * 0.5;
+
+            double velocityX = (client.world.random.nextDouble() - 0.5) * 0.1;
+            double velocityY = client.world.random.nextDouble() * 0.1;
+            double velocityZ = (client.world.random.nextDouble() - 0.5) * 0.1;
+
+            client.world.addParticle(
+                effect,
+                position.x + offsetX,
+                position.y + offsetY,
+                position.z + offsetZ,
+                velocityX, velocityY, velocityZ
+            );
         }
     }
 
-    private void renderParticle(HitParticle particle, MinecraftClient client, VertexConsumerProvider vertexConsumers, Matrix4f positionMatrix) {
-        Vec3d cameraPos = client.gameRenderer.getCamera().getPos();
-        Vec3d particlePos = particle.getPosition();
-        Vec3d relativePos = particlePos.subtract(cameraPos);
-
-        // Extract RGB components
-        int color = particle.getColor();
-        float r = ((color >> 16) & 0xFF) / 255.0f;
-        float g = ((color >> 8) & 0xFF) / 255.0f;
-        float b = (color & 0xFF) / 255.0f;
-        float a = particle.getAlpha();
-
-        // Simple particle rendering using quads
-        float scale = particle.getScale();
-        float half = scale / 2.0f;
-
-        // This is a simplified version - in production you'd use proper vertex consumers
-        // For now, particles are rendered as simple colored squares that fade out
+    // Vanilla particles render and animate themselves, nothing to do per-frame here.
+    public void render(WorldRenderContext context) {
     }
 
     public void clear() {
-        particles.clear();
     }
 }
