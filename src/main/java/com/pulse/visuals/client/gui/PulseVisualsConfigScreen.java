@@ -3,7 +3,6 @@ package com.pulse.visuals.client.gui;
 import com.pulse.visuals.config.ModConfig;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 
@@ -44,7 +43,7 @@ public class PulseVisualsConfigScreen extends Screen {
             () -> ModConfig.ENABLE_CRITICAL_EFFECT, v -> ModConfig.ENABLE_CRITICAL_EFFECT = v);
         y += spacing + 10;
 
-        addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> close())
+        addDrawableChild(ButtonWidget.builder(Text.translatable("gui.done"), button -> close())
             .dimensions(centerX - 100, y, 200, 20)
             .build());
     }
