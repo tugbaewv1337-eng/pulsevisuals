@@ -24,7 +24,7 @@ public class PulseVisualsConfigScreen extends Screen {
     // Stub toggle state shared across screen opens, for features not yet implemented.
     private static final Map<String, Boolean> stubStates = new HashMap<>();
 
-    private double previousBlurriness = 0.0;
+    private int previousBlurriness = 0;
 
     private final Screen parent;
     private int currentTab = 0; // 0 = Visuals, 1 = HUD, 2 = Utilities
@@ -115,7 +115,7 @@ public class PulseVisualsConfigScreen extends Screen {
         MinecraftClient client = MinecraftClient.getInstance();
         try {
             previousBlurriness = client.options.getMenuBackgroundBlurriness().getValue();
-            client.options.getMenuBackgroundBlurriness().setValue(0.0);
+            client.options.getMenuBackgroundBlurriness().setValue(0);
         } catch (Exception ignored) {
             // Option not present on this version; nothing to disable.
         }
