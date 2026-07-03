@@ -22,6 +22,12 @@ public class ModConfig {
     public static boolean ENABLE_POTIONS_HUD = false;
     public static boolean ENABLE_COOLDOWNS_HUD = false;
 
+    // Wave 2
+    public static boolean ENABLE_HIT_SOUNDS = false;
+    public static boolean ENABLE_FULL_BRIGHT = false;
+    public static boolean ENABLE_SPRINT_HUD = false;
+    public static boolean ENABLE_TOTEM_TRACKER = false;
+
     // Damage Numbers settings
     public static boolean ENABLE_DAMAGE_NUMBERS = true;
     public static float DAMAGE_NUMBER_SCALE = 1.0f;

@@ -67,10 +67,18 @@ public class PulseVisualsConfigScreen extends Screen {
             () -> ModConfig.ENABLE_HIT_PARTICLES, v -> ModConfig.ENABLE_HIT_PARTICLES = v));
         visualsFeatures.add(new FeatureDef("Critical Hit Effect", true,
             () -> ModConfig.ENABLE_CRITICAL_EFFECT, v -> ModConfig.ENABLE_CRITICAL_EFFECT = v));
+        visualsFeatures.add(new FeatureDef("Hit Sounds", true,
+            () -> ModConfig.ENABLE_HIT_SOUNDS, v -> ModConfig.ENABLE_HIT_SOUNDS = v));
+        visualsFeatures.add(new FeatureDef("Full Bright", true,
+            () -> ModConfig.ENABLE_FULL_BRIGHT, v -> ModConfig.ENABLE_FULL_BRIGHT = v));
+        visualsFeatures.add(new FeatureDef("Sprint", true,
+            () -> ModConfig.ENABLE_SPRINT_HUD, v -> ModConfig.ENABLE_SPRINT_HUD = v));
+        visualsFeatures.add(new FeatureDef("Totem Tracker", true,
+            () -> ModConfig.ENABLE_TOTEM_TRACKER, v -> ModConfig.ENABLE_TOTEM_TRACKER = v));
         String[] visualStubs = {
             "Animations", "Aspect Ratio", "Block Overlay", "China Hat", "Crosshair",
-            "Custom Hand", "Full Bright", "Hit Bubble", "Hit Color", "Hit Sounds",
-            "Sprint", "Tape Mouse", "Totem Tracker", "Free Look", "Zoom"
+            "Custom Hand", "Hit Bubble", "Hit Color",
+            "Tape Mouse", "Free Look", "Zoom"
         };
         for (String name : visualStubs) {
             visualsFeatures.add(new FeatureDef(name, false, stubGetter(name), stubSetter(name)));

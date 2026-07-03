@@ -10,14 +10,22 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
+import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 
 import java.util.Collection;
 
 public class ClientEventHandler {
     private final MinecraftClient client;
+
+    private boolean fullBrightApplied = false;
+    private double previousGamma = 1.0;
+
+    private int previousTotemStat = -1;
+    private int totemPopCount = 0;
 
     public ClientEventHandler() {
         this.client = MinecraftClient.getInstance();
@@ -29,6 +37,9 @@ public class ClientEventHandler {
             client.setScreen(new PulseVisualsConfigScreen(client.currentScreen));
         }
 
+        updateFullBright(client);
+        updateTotemTracker(client);
+
         if (!ModConfig.ENABLE_MOD || client.world == null || client.player == null) {
             return;
         }
@@ -38,6 +49,33 @@ public class ClientEventHandler {
 
         // Update trajectory prediction for projectiles
         PulseVisualsClient.getTrajectoryRenderer().update(client.world, client.player);
+    }
+
+    private void updateFullBright(MinecraftClient client) {
+        boolean shouldBeOn = ModConfig.ENABLE_MOD && ModConfig.ENABLE_FULL_BRIGHT;
+        if (shouldBeOn && !fullBrightApplied) {
+            previousGamma = client.options.getGamma().getValue();
+            client.options.getGamma().setValue(16.0);
+            fullBrightApplied = true;
+        } else if (!shouldBeOn && fullBrightApplied) {
+            client.options.getGamma().setValue(previousGamma);
+            fullBrightApplied = false;
+        }
+    }
+
+    private void updateTotemTracker(MinecraftClient client) {
+        if (!ModConfig.ENABLE_TOTEM_TRACKER || client.player == null) {
+            return;
+        }
+        int currentStat = client.player.getStatHandler().getStat(
+            Stats.USED.getOrCreateStat(Items.TOTEM_OF_UNDYING)
+        );
+        if (previousTotemStat == -1) {
+            previousTotemStat = currentStat;
+        } else if (currentStat > previousTotemStat) {
+            totemPopCount += (currentStat - previousTotemStat);
+            previousTotemStat = currentStat;
+        }
     }
 
     public void onWorldRenderEnd(WorldRenderContext context) {
@@ -140,6 +178,16 @@ public class ClientEventHandler {
                 String text = itemName + ": " + Math.round((1f - progress) * 100) + "%";
                 drawContext.drawTextWithShadow(textRenderer, text, screenWidth / 2 - textRenderer.getWidth(text) / 2, screenHeight / 2 + 20, 0xFF5555);
             }
+        }
+
+        if (ModConfig.ENABLE_SPRINT_HUD && client.player.isSprinting()) {
+            String text = "Sprinting";
+            drawContext.drawTextWithShadow(textRenderer, text, screenWidth / 2 - textRenderer.getWidth(text) / 2, screenHeight / 2 + 35, 0x55FF55);
+        }
+
+        if (ModConfig.ENABLE_TOTEM_TRACKER) {
+            String text = "Totems used: " + totemPopCount;
+            drawContext.drawTextWithShadow(textRenderer, text, 5, screenHeight - 15, 0xFFFFAA);
         }
     }
 }
