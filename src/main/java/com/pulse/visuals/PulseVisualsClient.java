@@ -39,11 +39,11 @@ public class PulseVisualsClient implements ClientModInitializer {
         trajectoryRenderer = new TrajectoryRenderer();
         eventHandler = new ClientEventHandler();
 
-        // Register the key used to open the settings panel (default: P)
+        // Register the key used to open the settings panel (default: Right Shift)
         openPanelKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.pulsevisuals.openpanel",
             InputUtil.Type.KEYSYM,
-            GLFW.GLFW_KEY_P,
+            GLFW.GLFW_KEY_RIGHT_SHIFT,
             "category.pulsevisuals"
         ));
 

@@ -1,6 +1,7 @@
 package com.pulse.visuals.client.gui;
 
 import com.pulse.visuals.config.ModConfig;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -22,6 +23,8 @@ public class PulseVisualsConfigScreen extends Screen {
 
     // Stub toggle state shared across screen opens, for features not yet implemented.
     private static final Map<String, Boolean> stubStates = new HashMap<>();
+
+    private double previousBlurriness = 0.0;
 
     private final Screen parent;
     private int currentTab = 0; // 0 = Visuals, 1 = HUD, 2 = Utilities
@@ -109,6 +112,14 @@ public class PulseVisualsConfigScreen extends Screen {
 
     @Override
     protected void init() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        try {
+            previousBlurriness = client.options.getMenuBackgroundBlurriness().getValue();
+            client.options.getMenuBackgroundBlurriness().setValue(0.0);
+        } catch (Exception ignored) {
+            // Option not present on this version; nothing to disable.
+        }
+
         panelWidth = Math.min(920, this.width - 40);
         panelHeight = Math.min(560, this.height - 60);
         panelX = (this.width - panelWidth) / 2;
@@ -230,8 +241,14 @@ public class PulseVisualsConfigScreen extends Screen {
 
     @Override
     public void close() {
-        if (this.client != null) {
-            this.client.setScreen(parent);
+        MinecraftClient client = MinecraftClient.getInstance();
+        try {
+            client.options.getMenuBackgroundBlurriness().setValue(previousBlurriness);
+        } catch (Exception ignored) {
+            // Option not present on this version; nothing to restore.
+        }
+        if (client != null) {
+            client.setScreen(parent);
         }
     }
 }
