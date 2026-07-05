@@ -24,6 +24,7 @@ public class PulseVisualsConfigScreen extends Screen {
     // Stub toggle state shared across screen opens, for features not yet implemented.
     private static final Map<String, Boolean> stubStates = new HashMap<>();
     private final Map<String, Float> knobAnim = new HashMap<>();
+    private final Map<String, Float> clickFlash = new HashMap<>();
 
     private static int lerpColor(int colorA, int colorB, float t) {
         t = Math.max(0f, Math.min(1f, t));
@@ -96,7 +97,9 @@ public class PulseVisualsConfigScreen extends Screen {
         String[] visualStubs = {
             "Animations", "Aspect Ratio", "Block Overlay", "China Hat", "Crosshair",
             "Custom Hand", "Hit Bubble", "Hit Color",
-            "Tape Mouse", "Free Look", "Zoom", "Jump Circles", "Hitbox"
+            "Free Look", "Zoom", "Jump Circles", "Hitbox",
+            "No Fluid", "Render Rest", "Self Name", "Time Changer",
+            "World Customizer", "World Particles", "Halo", "Trails", "Target ESP"
         };
         for (String name : visualStubs) {
             visualsFeatures.add(new FeatureDef(name, false, stubGetter(name), stubSetter(name)));
@@ -241,6 +244,17 @@ public class PulseVisualsConfigScreen extends Screen {
                 context.fill(rx, ry + 4, rx + 2, ry + rh - 4, PURPLE);
             }
 
+            // Click flash: brief bright pulse that fades out after pressing
+            String flashKey = toggleRow.feature().name();
+            float flash = clickFlash.getOrDefault(flashKey, 0f);
+            if (flash > 0f) {
+                int alpha = (int) (flash * 90);
+                int flashColor = (alpha << 24) | 0xFFFFFF;
+                context.fill(rx + 1, ry + 1, rx + rw - 1, ry + rh - 1, flashColor);
+                flash -= 0.12f;
+                clickFlash.put(flashKey, Math.max(0f, flash));
+            }
+
             int textColor = toggleRow.feature().implemented() ? 0xFFFFFFFF : (int) TEXT_MUTED;
             context.drawTextWithShadow(this.textRenderer, toggleRow.feature().name(), toggleRow.x() + 10, toggleRow.y() + 10, textColor);
 
@@ -286,6 +300,7 @@ public class PulseVisualsConfigScreen extends Screen {
                     && mouseY >= toggleRow.y() && mouseY <= toggleRow.y() + toggleRow.h()) {
                     boolean current = toggleRow.feature().getter().getAsBoolean();
                     toggleRow.feature().setter().accept(!current);
+                    clickFlash.put(toggleRow.feature().name(), 1f);
                     return true;
                 }
             }
