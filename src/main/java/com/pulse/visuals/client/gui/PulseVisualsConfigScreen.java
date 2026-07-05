@@ -203,7 +203,25 @@ public class PulseVisualsConfigScreen extends Screen {
         rebuildRows();
 
         for (ToggleRow toggleRow : visibleRows) {
-            context.fill(toggleRow.x(), toggleRow.y(), toggleRow.x() + toggleRow.w(), toggleRow.y() + toggleRow.h(), (int) ROW_BG);
+            boolean hovered = mouseX >= toggleRow.x() && mouseX <= toggleRow.x() + toggleRow.w()
+                && mouseY >= toggleRow.y() && mouseY <= toggleRow.y() + toggleRow.h();
+            int rowColor = hovered ? 0xFF29293A : ROW_BG;
+
+            int rx = toggleRow.x();
+            int ry = toggleRow.y();
+            int rw = toggleRow.w();
+            int rh = toggleRow.h();
+
+            // Main body
+            context.fill(rx + 2, ry, rx + rw - 2, ry + rh, rowColor);
+            context.fill(rx, ry + 2, rx + rw, ry + rh - 2, rowColor);
+            // Soften corners slightly to fake rounded edges
+            context.fill(rx + 1, ry + 1, rx + rw - 1, ry + rh - 1, rowColor);
+
+            if (hovered) {
+                // Accent bar on the left, like an active/selected row
+                context.fill(rx, ry + 4, rx + 2, ry + rh - 4, PURPLE);
+            }
 
             int textColor = toggleRow.feature().implemented() ? 0xFFFFFFFF : (int) TEXT_MUTED;
             context.drawTextWithShadow(this.textRenderer, toggleRow.feature().name(), toggleRow.x() + 10, toggleRow.y() + 10, textColor);
