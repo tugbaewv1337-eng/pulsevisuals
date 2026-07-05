@@ -132,7 +132,9 @@ public class PulseVisualsConfigScreen extends Screen {
             () -> ModConfig.ENABLE_TRAJECTORY_PREDICTION, v -> ModConfig.ENABLE_TRAJECTORY_PREDICTION = v));
         String[] utilityStubs = {
             "Item Highlighter", "Item Pickup Logger", "Item Scroller", "Item Swap",
-            "Lock Slot", "Shift Tab", "Sound Controller", "Shulker Preview", "Streamer Mode"
+            "Lock Slot", "Shift Tab", "Shift Tap", "Sound Controller", "Shulker Preview", "Streamer Mode",
+            "Healing Helper", "PvP Save", "Auto Leave", "Auto Reconnect", "Auto Resell",
+            "Fake Player", "Anarchy Finder"
         };
         for (String name : utilityStubs) {
             utilitiesFeatures.add(new FeatureDef(name, false, stubGetter(name), stubSetter(name)));
