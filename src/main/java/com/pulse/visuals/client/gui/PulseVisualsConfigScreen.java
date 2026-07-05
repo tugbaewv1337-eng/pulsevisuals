@@ -43,6 +43,22 @@ public class PulseVisualsConfigScreen extends Screen {
         return (a << 24) | (r << 16) | (g << 8) | b;
     }
 
+    /**
+     * Draws a rectangle with smoothly stair-stepped (approximately rounded) corners.
+     * bgColor should match whatever sits directly behind this rectangle so the
+     * cut-away corner pixels blend seamlessly into it.
+     */
+    private static void fillRounded(DrawContext context, int x1, int y1, int x2, int y2, int color, int bgColor, int radius) {
+        context.fill(x1, y1, x2, y2, color);
+        for (int i = 0; i < radius; i++) {
+            int cut = radius - i;
+            context.fill(x1, y1 + i, x1 + cut, y1 + i + 1, bgColor);
+            context.fill(x2 - cut, y1 + i, x2, y1 + i + 1, bgColor);
+            context.fill(x1, y2 - i - 1, x1 + cut, y2 - i, bgColor);
+            context.fill(x2 - cut, y2 - i - 1, x2, y2 - i, bgColor);
+        }
+    }
+
     private int previousBlurriness = 0;
 
     private final Screen parent;
@@ -206,7 +222,7 @@ public class PulseVisualsConfigScreen extends Screen {
         context.fill(0, 0, this.width, this.height, 0x99000000);
 
         // Main panel background
-        context.fill(panelX, panelY, panelX + panelWidth, panelY + panelHeight, PANEL_BG);
+        fillRounded(context, panelX, panelY, panelX + panelWidth, panelY + panelHeight, PANEL_BG, 0x99000000, 6);
 
         // Title
         context.drawCenteredTextWithShadow(this.textRenderer, "PulseVisuals", panelX + panelWidth / 2, panelY + 8, 0xFFFFFFFF);
@@ -235,11 +251,8 @@ public class PulseVisualsConfigScreen extends Screen {
             int rw = toggleRow.w();
             int rh = toggleRow.h();
 
-            // Main body
-            context.fill(rx + 2, ry, rx + rw - 2, ry + rh, rowColor);
-            context.fill(rx, ry + 2, rx + rw, ry + rh - 2, rowColor);
-            // Soften corners slightly to fake rounded edges
-            context.fill(rx + 1, ry + 1, rx + rw - 1, ry + rh - 1, rowColor);
+            // Main body with smooth rounded corners
+            fillRounded(context, rx, ry, rx + rw, ry + rh, rowColor, PANEL_BG, 4);
 
             if (hovered) {
                 // Accent bar on the left, like an active/selected row
@@ -252,7 +265,7 @@ public class PulseVisualsConfigScreen extends Screen {
             if (flash > 0f) {
                 int alpha = (int) (flash * 90);
                 int flashColor = (alpha << 24) | 0xFFFFFF;
-                context.fill(rx + 1, ry + 1, rx + rw - 1, ry + rh - 1, flashColor);
+                fillRounded(context, rx, ry, rx + rw, ry + rh, flashColor, rowColor, 4);
                 flash -= 0.12f;
                 clickFlash.put(flashKey, Math.max(0f, flash));
             }
@@ -276,12 +289,12 @@ public class PulseVisualsConfigScreen extends Screen {
             int trackY1 = toggleRow.y() + 9;
             int trackY2 = trackY1 + 12;
             int trackColor = lerpColor((int) TRACK_OFF, PURPLE, current);
-            context.fill(trackX1, trackY1, trackX2, trackY2, trackColor);
+            fillRounded(context, trackX1, trackY1, trackX2, trackY2, trackColor, rowColor, 6);
 
             int knobSize = 10;
             int knobTravel = (trackX2 - knobSize - 1) - (trackX1 + 1);
             int knobX = trackX1 + 1 + Math.round(current * knobTravel);
-            context.fill(knobX, trackY1 + 1, knobX + knobSize, trackY2 - 1, 0xFFFFFFFF);
+            fillRounded(context, knobX, trackY1 + 1, knobX + knobSize, trackY2 - 1, 0xFFFFFFFF, trackColor, 3);
         }
 
         super.render(context, mouseX, mouseY, delta);
