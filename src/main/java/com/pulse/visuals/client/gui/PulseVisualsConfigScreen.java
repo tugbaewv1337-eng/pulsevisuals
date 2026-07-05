@@ -23,6 +23,24 @@ public class PulseVisualsConfigScreen extends Screen {
 
     // Stub toggle state shared across screen opens, for features not yet implemented.
     private static final Map<String, Boolean> stubStates = new HashMap<>();
+    private final Map<String, Float> knobAnim = new HashMap<>();
+
+    private static int lerpColor(int colorA, int colorB, float t) {
+        t = Math.max(0f, Math.min(1f, t));
+        int aA = (colorA >> 24) & 0xFF;
+        int rA = (colorA >> 16) & 0xFF;
+        int gA = (colorA >> 8) & 0xFF;
+        int bA = colorA & 0xFF;
+        int aB = (colorB >> 24) & 0xFF;
+        int rB = (colorB >> 16) & 0xFF;
+        int gB = (colorB >> 8) & 0xFF;
+        int bB = colorB & 0xFF;
+        int a = (int) (aA + (aB - aA) * t);
+        int r = (int) (rA + (rB - rA) * t);
+        int g = (int) (gA + (gB - gA) * t);
+        int b = (int) (bA + (bB - bA) * t);
+        return (a << 24) | (r << 16) | (g << 8) | b;
+    }
 
     private int previousBlurriness = 0;
 
@@ -78,7 +96,7 @@ public class PulseVisualsConfigScreen extends Screen {
         String[] visualStubs = {
             "Animations", "Aspect Ratio", "Block Overlay", "China Hat", "Crosshair",
             "Custom Hand", "Hit Bubble", "Hit Color",
-            "Tape Mouse", "Free Look", "Zoom"
+            "Tape Mouse", "Free Look", "Zoom", "Jump Circles", "Hitbox"
         };
         for (String name : visualStubs) {
             visualsFeatures.add(new FeatureDef(name, false, stubGetter(name), stubSetter(name)));
@@ -226,17 +244,27 @@ public class PulseVisualsConfigScreen extends Screen {
             int textColor = toggleRow.feature().implemented() ? 0xFFFFFFFF : (int) TEXT_MUTED;
             context.drawTextWithShadow(this.textRenderer, toggleRow.feature().name(), toggleRow.x() + 10, toggleRow.y() + 10, textColor);
 
-            // Toggle switch (track + knob)
+            // Toggle switch (track + knob) with smooth sliding animation
             boolean on = toggleRow.feature().getter().getAsBoolean();
+            String animKey = toggleRow.feature().name();
+            float target = on ? 1f : 0f;
+            float current = knobAnim.getOrDefault(animKey, target);
+            current += (target - current) * 0.35f;
+            if (Math.abs(target - current) < 0.01f) {
+                current = target;
+            }
+            knobAnim.put(animKey, current);
+
             int trackX2 = toggleRow.x() + toggleRow.w() - 10;
             int trackX1 = trackX2 - 34;
             int trackY1 = toggleRow.y() + 9;
             int trackY2 = trackY1 + 12;
-            int trackColor = on ? PURPLE : (int) TRACK_OFF;
+            int trackColor = lerpColor((int) TRACK_OFF, PURPLE, current);
             context.fill(trackX1, trackY1, trackX2, trackY2, trackColor);
 
             int knobSize = 10;
-            int knobX = on ? (trackX2 - knobSize - 1) : (trackX1 + 1);
+            int knobTravel = (trackX2 - knobSize - 1) - (trackX1 + 1);
+            int knobX = trackX1 + 1 + Math.round(current * knobTravel);
             context.fill(knobX, trackY1 + 1, knobX + knobSize, trackY2 - 1, 0xFFFFFFFF);
         }
 
