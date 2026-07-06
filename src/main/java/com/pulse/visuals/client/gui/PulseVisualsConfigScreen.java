@@ -252,7 +252,7 @@ public class PulseVisualsConfigScreen extends Screen {
             int rh = toggleRow.h();
 
             // Main body with smooth rounded corners
-            fillRounded(context, rx, ry, rx + rw, ry + rh, rowColor, PANEL_BG, 10);
+            fillRounded(context, rx, ry, rx + rw, ry + rh, rowColor, 0xFF000000, 8);
 
             if (hovered) {
                 // Accent bar on the left, like an active/selected row
