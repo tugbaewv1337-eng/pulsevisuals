@@ -222,7 +222,7 @@ public class PulseVisualsConfigScreen extends Screen {
         context.fill(0, 0, this.width, this.height, 0x99000000);
 
         // Main panel background
-        fillRounded(context, panelX, panelY, panelX + panelWidth, panelY + panelHeight, PANEL_BG, 0x99000000, 6);
+        fillRounded(context, panelX, panelY, panelX + panelWidth, panelY + panelHeight, PANEL_BG, 0x99000000, 12);
 
         // Title
         context.drawCenteredTextWithShadow(this.textRenderer, "PulseVisuals", panelX + panelWidth / 2, panelY + 8, 0xFFFFFFFF);
@@ -252,11 +252,11 @@ public class PulseVisualsConfigScreen extends Screen {
             int rh = toggleRow.h();
 
             // Main body with smooth rounded corners
-            fillRounded(context, rx, ry, rx + rw, ry + rh, rowColor, PANEL_BG, 4);
+            fillRounded(context, rx, ry, rx + rw, ry + rh, rowColor, PANEL_BG, 10);
 
             if (hovered) {
                 // Accent bar on the left, like an active/selected row
-                context.fill(rx, ry + 4, rx + 2, ry + rh - 4, PURPLE);
+                context.fill(rx, ry + 8, rx + 3, ry + rh - 8, PURPLE);
             }
 
             // Click flash: brief bright pulse that fades out after pressing
@@ -265,7 +265,7 @@ public class PulseVisualsConfigScreen extends Screen {
             if (flash > 0f) {
                 int alpha = (int) (flash * 90);
                 int flashColor = (alpha << 24) | 0xFFFFFF;
-                fillRounded(context, rx, ry, rx + rw, ry + rh, flashColor, rowColor, 4);
+                fillRounded(context, rx, ry, rx + rw, ry + rh, flashColor, rowColor, 10);
                 flash -= 0.12f;
                 clickFlash.put(flashKey, Math.max(0f, flash));
             }
